@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cinesguardi — Archivio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Spectral:ital,wght@0,400;0,500;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#11100e;
+  --paper-2:#16140f;
+  --ink:#ece6da;
+  --ink-soft:#b3ac9c;
+  --ink-faint:#6f6a5e;
+  --line:#322e26;
+  --accent:#c9532b;
+  --accent-soft:#d98a55;
+  --max:1240px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--paper);color:var(--ink);
+  font-family:'Spectral',Georgia,serif;font-size:18px;line-height:1.6;
+  -webkit-font-smoothing:antialiased;
+}
+a{color:inherit;text-decoration:none}
+.mono{font-family:'IBM Plex Mono',monospace;}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 28px}
+
+/* ---------- Masthead ---------- */
+header.mast{border-bottom:1px solid var(--line);position:sticky;top:0;z-index:40;
+  background:rgba(17,16,14,.86);backdrop-filter:blur(14px)}
+.mast-row{display:flex;align-items:baseline;gap:18px;padding:18px 0 16px;flex-wrap:wrap}
+.logo{font-family:'Fraunces',serif;font-weight:600;font-size:25px;letter-spacing:-.01em;
+  cursor:pointer;line-height:1}
+.logo b{color:var(--accent);font-weight:600}
+.tagline{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-faint);padding-bottom:2px}
+.mast-spacer{flex:1}
+.count{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-soft)}
+.count b{color:var(--ink)}
+
+/* ---------- Controls ---------- */
+.controls{display:flex;gap:14px;align-items:center;flex-wrap:wrap;
+  padding:16px 0 18px;border-bottom:1px solid var(--line)}
+.search{flex:1;min-width:220px;position:relative}
+.search input{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line);
+  color:var(--ink);font-family:'Spectral',serif;font-size:19px;padding:8px 4px 8px 26px;outline:none}
+.search input::placeholder{color:var(--ink-faint);font-style:italic}
+.search input:focus{border-color:var(--accent)}
+.search svg{position:absolute;left:0;top:11px;width:16px;height:16px;stroke:var(--ink-faint)}
+.filters{display:flex;gap:10px;flex-wrap:wrap}
+select{appearance:none;background:var(--paper-2);color:var(--ink-soft);border:1px solid var(--line);
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  padding:8px 30px 8px 12px;cursor:pointer;border-radius:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236f6a5e' fill='none' stroke-width='1.3'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 11px center}
+select:focus{outline:none;border-color:var(--accent);color:var(--ink)}
+
+/* ---------- Grid ---------- */
+main{min-height:60vh}
+.resultline{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);padding:22px 0 4px}
+.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:34px 30px;padding:18px 0 80px}
+@media(max-width:1000px){.grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:680px){.grid{grid-template-columns:repeat(2,1fr);gap:26px 18px}}
+.card{cursor:pointer;display:flex;flex-direction:column}
+.poster{position:relative;aspect-ratio:2/3;overflow:hidden;background:var(--paper-2);
+  border:1px solid var(--line)}
+.poster img{width:100%;height:100%;object-fit:cover;display:block;
+  filter:saturate(.92) contrast(1.02);transition:transform .6s cubic-bezier(.2,.7,.2,1),filter .4s}
+.card:hover .poster img{transform:scale(1.045);filter:saturate(1.05) contrast(1.03)}
+.cqnum{position:absolute;top:0;left:0;background:var(--paper);color:var(--accent-soft);
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.05em;
+  padding:5px 9px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}
+.meta{padding:13px 2px 0}
+.ctitle{font-family:'Fraunces',serif;font-size:18px;line-height:1.2;font-weight:500;
+  letter-spacing:-.005em}
+.cdir{color:var(--ink-soft);font-style:italic;font-size:15px;margin-top:3px}
+.cyear{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--ink-faint);
+  letter-spacing:.08em;margin-top:6px}
+.empty{padding:80px 0;text-align:center;color:var(--ink-soft);font-style:italic}
+.empty span{color:var(--accent)}
+
+/* ---------- Film page ---------- */
+.film{display:none}
+.film.active{display:block}
+.list-view.hidden{display:none}
+.filmwrap{max-width:920px;margin:0 auto;padding:0 28px}
+.back{display:inline-flex;align-items:center;gap:9px;margin:34px 0 6px;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--ink-faint);cursor:pointer}
+.back:hover{color:var(--accent)}
+.back svg{width:14px;height:14px;stroke:currentColor}
+.fhead{display:grid;grid-template-columns:200px 1fr;gap:40px;padding:24px 0 36px}
+@media(max-width:640px){.fhead{grid-template-columns:1fr;gap:24px}
+  .fposter{max-width:200px}}
+.fposter{border:1px solid var(--line);aspect-ratio:2/3;overflow:hidden;background:var(--paper-2)}
+.fposter img{width:100%;height:100%;object-fit:cover}
+.fnum{font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.2em;
+  color:var(--accent-soft);text-transform:uppercase}
+.ftitle{font-family:'Fraunces',serif;font-size:42px;line-height:1.04;font-weight:600;
+  letter-spacing:-.02em;margin:14px 0 8px}
+@media(max-width:640px){.ftitle{font-size:33px}}
+.fdir{font-style:italic;color:var(--ink-soft);font-size:21px;margin-bottom:24px}
+.specs{display:flex;flex-wrap:wrap;gap:0;border-top:1px solid var(--line);max-width:580px}
+.spec{padding:11px 0;display:flex;gap:14px;width:100%;border-bottom:1px solid var(--line)}
+.spec dt{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-faint);width:96px;flex-shrink:0;padding-top:4px}
+.spec dd{margin:0;color:var(--ink)}
+.pres{padding:44px 0 30px;max-width:680px;margin:0 auto}
+.pres .salut{font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-faint);margin-bottom:30px;
+  padding-bottom:0;display:flex;align-items:center;gap:14px}
+.pres .salut::after{content:"";flex:1;height:1px;background:var(--line)}
+.pres p{margin:0 0 22px;font-size:19.5px;line-height:1.74;color:var(--ink);text-align:left;-webkit-hyphens:manual;hyphens:manual;overflow-wrap:break-word;text-wrap:pretty}
+.pres p.leadp::first-letter{font-family:'Fraunces',serif;font-size:60px;float:left;line-height:.82;padding:6px 12px 0 0;color:#c97b3b;font-weight:600}.pres p.leadp:has(.dropcap)::first-letter{all:unset}.pres .dropcap{font-family:'Fraunces',serif;font-size:60px;float:left;line-height:.82;padding:6px 12px 0 0;color:#c97b3b;font-weight:600}.pres .dq{float:left;font-family:'Fraunces',serif;font-size:60px;line-height:.82;padding:6px 2px 0 0;color:#c97b3b;font-weight:600}.pres p{ }.pres em{font-style:italic}.pres strong{font-weight:600}.pres .filmtitle{font-style:italic}
+.pubsign{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);text-align:right;
+  font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-faint)}
+.trailerblock{margin:50px 0 8px}
+.trailer-lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.18em;
+  text-transform:uppercase;color:var(--ink-faint);display:flex;align-items:center;gap:12px;margin:0 0 14px}
+.trailer-lbl::after{content:"";flex:1;height:1px;background:var(--line)}
+.trailer-lbl .dur{color:var(--accent-soft)}
+.trailer{position:relative;aspect-ratio:16/9;background:#000;border:1px solid var(--line);overflow:hidden}
+.trailer iframe{width:100%;height:100%;border:0;display:block}
+.fnav{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border-top:1px solid var(--line);border-bottom:1px solid var(--line);margin:46px 0 0}
+.fnav a{background:var(--paper);padding:18px 20px;cursor:pointer;transition:background .25s;display:flex;align-items:center;gap:16px;min-height:124px;text-decoration:none}
+.fnav a:hover{background:var(--paper-2)}
+.fnav a.prev{flex-direction:row;justify-content:flex-start;text-align:left}.fnav a.prev .navthumb{order:1;margin-right:0}.fnav a.prev .navtxt{order:2}.fnav a.next{flex-direction:row;justify-content:flex-end;text-align:right}.fnav a.next .navthumb{order:2}.fnav a.next .navtxt{order:1}
+.fnav .lbl{font-family:'IBM Plex Mono',monospace;font-size:10px;letter-spacing:.16em;
+  text-transform:uppercase;color:var(--ink-faint);display:block;margin-bottom:7px}
+.fnav .t{font-family:'Fraunces',serif;font-size:18px;color:var(--ink);font-weight:500}
+.fnav a.disabled{opacity:.3;pointer-events:none}
+
+footer{border-top:1px solid var(--line);padding:36px 0 60px;margin-top:30px}
+.foot-row{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;
+  font-family:'IBM Plex Mono',monospace;font-size:11px;letter-spacing:.12em;
+  text-transform:uppercase;color:var(--ink-faint)}
+.foot-row b{color:var(--ink-soft);font-weight:500}
+
+::selection{background:var(--accent);color:#fff}
+.xref{color:var(--accent-soft);cursor:pointer;text-decoration:none;border-bottom:1px solid color-mix(in srgb,var(--accent-soft) 35%,transparent);white-space:nowrap}.xref:hover{color:var(--accent);border-bottom-color:var(--accent)}.fnav .navtxt{flex:1;min-width:0}.fnav .navthumb{flex-shrink:0;width:74px;aspect-ratio:2/3;border:1px solid var(--line);overflow:hidden;background:var(--paper-2)}.fnav .navthumb img{width:100%;height:100%;object-fit:cover;display:block}.fnav .t{overflow-wrap:anywhere;word-break:break-word;min-width:0}
+@media(max-width:640px){.fhead{grid-template-columns:1fr;gap:24px}.fposter{max-width:200px;margin:0 auto}.ftitle{font-size:33px}.fnav{grid-template-columns:1fr;gap:1px}.fnav a{min-height:0;padding:16px 6px}.fnav a.next,.fnav a.prev{flex-direction:row;justify-content:flex-start;text-align:left}.fnav a.next .navthumb,.fnav a.prev .navthumb{order:1;margin-right:14px;margin-left:0}.fnav a.next .navtxt,.fnav a.prev .navtxt{order:2;text-align:left}.fnav .navthumb{width:62px}.filmwrap{padding:0 18px}}</style>
+</head>
+<body>
+
+<header class="mast">
+
+  <div class="wrap">
+    <div class="mast-row">
+      <div class="logo" onclick="goHome()">Cine<b>sguardi</b></div>
+      <div class="tagline">Archivio delle presentazioni</div>
+      <div class="mast-spacer"></div>
+      <div class="count"><b id="totcount">0</b> film in archivio</div>
+    </div>
+  </div>
+</header>
+
+<!-- ============ LIST VIEW ============ -->
+<div class="list-view" id="listView">
+  <div class="wrap">
+    <div class="controls">
+      <div class="search">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/></svg>
+        <input id="q" type="text" placeholder="Cerca un film, un regista, una parola&hellip;" autocomplete="off">
+      </div>
+      <div class="filters">
+        <select id="fYear"><option value="">Tutti gli anni</option></select>
+        <select id="fDir"><option value="">Tutti i registi</option></select>
+        <select id="sort">
+          <option value="num">N° Cinesguardi</option>
+          <option value="title">Titolo A–Z</option>
+          <option value="year">Anno recente</option>
+        </select>
+      </div>
+    </div>
+    <div class="resultline" id="resultline"></div>
+    <div class="grid" id="grid"></div>
+  </div>
+</div>
+
+<!-- ============ FILM VIEW ============ -->
+<div class="film" id="filmView">
+  <div class="filmwrap">
+    <div class="back" onclick="goHome()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Torna all'archivio
+    </div>
+  </div>
+  <div id="filmContent"></div>
+</div>
+
+<footer>
+  <div class="wrap foot-row">
+    <div>Cinesguardi — <b>cineclub online</b></div>
+    <div>Archivio · Memoria · Cinefilia</div>
+    <div><b>Presentazioni originali</b> dal 2020</div>
+  </div>
+</footer>
+
+<script>
+let FILMS = [];
+</script>
+<script>
+const state={q:'',year:'',dir:'',sort:'num'};
+const grid=document.getElementById('grid');
+const $=s=>document.querySelector(s);
+
+
+
+// populate filters
+
+function norm(s){return (s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');}
+function matches(f){
+  if(state.year && String(f.anno)!==state.year) return false;
+  if(state.dir && f.regista!==state.dir) return false;
+  if(state.q){
+    const q=norm(state.q);
+    const hay=norm(f.titolo+' '+f.regista+' '+f.lingua+' '+String(f.n)+' '+f.presentazione.join(' '));
+    if(!hay.includes(q)) return false;
+  }
+  return true;
+}
+function sortFn(a,b){
+  if(state.sort==='title') return a.titolo.localeCompare(b.titolo);
+  if(state.sort==='year') return b.anno-a.anno || b.n-a.n;
+  return b.n-a.n;
+}
+let current=[];
+function render(){
+  current=FILMS.filter(matches).sort(sortFn);
+  grid.innerHTML='';
+  const rl=$('#resultline');
+  if(state.q||state.year||state.dir){
+    rl.textContent=current.length+(current.length===1?' risultato':' risultati');
+  } else { rl.textContent='Gli ultimi titoli proposti'; }
+  if(!current.length){
+    grid.innerHTML='<div class="empty">Nessun film corrisponde a <span>&laquo;'+
+      (state.q||state.dir||state.year)+'&raquo;</span></div>';return;
+  }
+  current.forEach(f=>{
+    const c=document.createElement('div');c.className='card';
+    c.onclick=()=>openFilm(f.n);
+    c.innerHTML=`<div class="poster"><span class="cqnum">N° ${f.n}</span>
+      <img loading="lazy" src="locandine/${f.file}" alt="Locandina di ${f.titolo}"></div>
+      <div class="meta"><div class="ctitle">${f.titolo}</div>
+      <div class="cdir">${f.regista}</div>
+      <div class="cyear">N° ${f.n} · ${f.anno} · ${f.durata}</div></div>`;
+    grid.append(c);
+  });
+}
+$('#q').addEventListener('input',e=>{state.q=e.target.value;render();});
+$('#fYear').addEventListener('change',e=>{state.year=e.target.value;render();});
+$('#fDir').addEventListener('change',e=>{state.dir=e.target.value;render();});
+$('#sort').addEventListener('change',e=>{state.sort=e.target.value;render();});
+
+
+// Trasforma i riferimenti "[Archivio N. xxx]" in link cliccabili se il film è in archivio.
+function linkRefs(text){
+  return text.replace(/\[\s*Archivio\s*N[°.]?\s*(\d{1,4})\s*\]/gi, function(whole, num){
+    const n = parseInt(num,10);
+    const exists = FILMS.some(x=>x.n===n);
+    if(exists){
+      return '<a class="xref" onclick="event.stopPropagation();openFilm('+n+')" title="Vai alla scheda N° '+n+'">[Archivio N. '+num+']</a>';
+    }
+    return whole; // film non in archivio: lascio il testo invariato
+  });
+}
+
+function openFilm(n){
+  const f=FILMS.find(x=>x.n===n);if(!f)return;
+  const idx=FILMS.findIndex(x=>x.n===n); // FILMS is 940..927 order
+  const prev=FILMS[idx-1]; // higher number
+  const next=FILMS[idx+1]; // lower number
+  const paras=f.presentazione.map((p,i)=>'<p'+(i===0?' class="leadp"':'')+'>'+linkRefs(p)+'</p>').join('');
+  const specs=[
+    ['Regista',f.regista],['Anno',f.anno],['Durata',f.durata],
+    ['Lingua',f.lingua]
+  ].map(([k,v])=>`<div class="spec"><dt>${k}</dt><dd>${v}</dd></div>`).join('');
+  const trailer = f.trailer ? `
+      <div class="trailerblock">
+        <div class="trailer-lbl">Guarda il trailer${f.durata_trailer?` <span class="dur">${f.durata_trailer}</span>`:''}</div>
+        <div class="trailer"><iframe src="https://www.youtube-nocookie.com/embed/${f.trailer}" title="Trailer di ${f.titolo}" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen loading="lazy"></iframe></div>
+      </div>` : '';
+  $('#filmContent').innerHTML=`
+    <div class="filmwrap">
+      <div class="fhead">
+        <div class="fposter"><img src="locandine/${f.file}" alt="Locandina di ${f.titolo}"></div>
+        <div>
+          <div class="fnum">N° ${f.n} — Cinesguardi</div>
+          <h1 class="ftitle">${f.titolo}</h1>
+          <div class="fdir">di ${f.regista}</div>
+          <dl class="specs">${specs}</dl>
+        </div>
+      </div>
+      <div class="pres">
+        <div class="salut">Cari cinefili</div>
+        ${paras}
+        ${f.data_pub?`<div class="pubsign">Cinesguardi — ${f.data_pub}</div>`:''}
+      </div>
+      ${trailer}
+      <nav class="fnav">
+        <a class="prev ${prev?'':'disabled'}" ${prev?`onclick="openFilm(${prev.n})"`:''}>
+          ${prev?`<div class="navthumb"><img loading="lazy" src="locandine/${prev.file}" alt=""></div>`:''}
+          <div class="navtxt"><span class="lbl">&larr; Film precedente</span>
+          <span class="t">${prev?'N° '+prev.n+' · '+prev.titolo:'&mdash;'}</span></div></a>
+        <a class="next ${next?'':'disabled'}" ${next?`onclick="openFilm(${next.n})"`:''}>
+          <div class="navtxt"><span class="lbl">Film successivo &rarr;</span>
+          <span class="t">${next?'N° '+next.n+' · '+next.titolo:'&mdash;'}</span></div>
+          ${next?`<div class="navthumb"><img loading="lazy" src="locandine/${next.file}" alt=""></div>`:''}</a>
+      </nav>
+    </div>`;
+  document.getElementById('listView').classList.add('hidden');
+  document.getElementById('filmView').classList.add('active');
+  window.scrollTo({top:0,behavior:'instant'});
+  history.pushState({film:n},'','#'+n);
+}
+function goHome(){
+  document.getElementById('filmView').classList.remove('active');
+  document.getElementById('listView').classList.remove('hidden');
+  history.pushState({},'','#');
+  window.scrollTo({top:0,behavior:'instant'});
+}
+window.addEventListener('popstate',e=>{
+  if(e.state&&e.state.film){openFilm(e.state.film);}else{goHome();}
+});
+
+// Carica i dati da films.json (sito reale su server / GitHub Pages)
+fetch('films.json')
+  .then(r=>{ if(!r.ok) throw new Error('HTTP '+r.status); return r.arrayBuffer(); })
+  .then(buf=>JSON.parse(new TextDecoder('utf-8').decode(buf)))
+  .then(data=>{
+     FILMS = data;
+     boot();
+  })
+  .catch(err=>{
+     document.getElementById('grid').innerHTML =
+       '<div class="empty">Impossibile caricare i dati dell\'archivio.<br>'+
+       '<span style="font-size:13px">Apri il sito tramite un server (es. GitHub Pages) e non con doppio click sul file.</span></div>';
+     console.error('Errore nel caricamento di films.json:', err);
+  });
+
+function boot(){
+  document.getElementById('totcount').textContent=FILMS.length;
+  // popola filtri
+  [...new Set(FILMS.map(f=>f.anno))].sort((a,b)=>b-a).forEach(y=>{
+    const o=document.createElement('option');o.value=y;o.textContent=y;document.querySelector('#fYear').append(o);});
+  [...new Set(FILMS.map(f=>f.regista))].sort((a,b)=>a.localeCompare(b)).forEach(d=>{
+    const o=document.createElement('option');o.value=d;o.textContent=d;document.querySelector('#fDir').append(o);});
+  render();
+  const hh=location.hash.replace('#','');
+  if(hh&&FILMS.find(x=>x.n==hh)) openFilm(parseInt(hh));
+}
+</script>
+</body>
+</html>
