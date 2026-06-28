@@ -118,7 +118,7 @@ main{min-height:60vh}
   padding-bottom:0;display:flex;align-items:center;gap:14px}
 .pres .salut::after{content:"";flex:1;height:1px;background:var(--line)}
 .pres p{margin:0 0 22px;font-size:19.5px;line-height:1.74;color:var(--ink);text-align:left;-webkit-hyphens:manual;hyphens:manual;overflow-wrap:break-word;text-wrap:pretty}
-.pres p.leadp::first-letter{font-family:'Fraunces',serif;font-size:60px;float:left;line-height:.82;padding:6px 12px 0 0;color:#c97b3b;font-weight:600}.pres p.leadp:has(.dropcap)::first-letter{all:unset}.pres .dropcap{font-family:'Fraunces',serif;font-size:60px;float:left;line-height:.82;padding:6px 12px 0 0;color:#c97b3b;font-weight:600}.pres .dq{float:left;font-family:'Fraunces',serif;font-size:60px;line-height:.82;padding:6px 2px 0 0;color:#c97b3b;font-weight:600}.pres p{ }.pres em{font-style:italic}.pres strong{font-weight:600}.pres .filmtitle{font-style:italic}
+.pres p.leadp::first-letter{font-family:'Fraunces',serif;font-size:60px;float:left;line-height:.82;padding:6px 12px 0 0;color:#c97b3b;font-weight:600}.pres p.leadp:has(.dropcap)::first-letter{all:unset}.pres p.quotelead::first-letter{all:unset}.pres .dropcap{font-family:'Fraunces',serif;font-size:60px;float:left;line-height:.82;padding:6px 12px 0 0;color:#c97b3b;font-weight:600}.pres .dq{float:left;font-family:'Fraunces',serif;font-size:60px;line-height:.82;padding:6px 2px 0 0;color:#c97b3b;font-weight:600}.pres p{ }.pres em{font-style:italic}.pres strong{font-weight:600}.pres .filmtitle{font-style:italic}
 .pubsign{margin-top:34px;padding-top:18px;border-top:1px solid var(--line);text-align:right;
   font-family:'IBM Plex Mono',monospace;font-size:12px;letter-spacing:.12em;
   text-transform:uppercase;color:var(--ink-faint)}
@@ -278,7 +278,21 @@ function openFilm(n){
   const idx=FILMS.findIndex(x=>x.n===n); // FILMS is 940..927 order
   const prev=FILMS[idx-1]; // higher number
   const next=FILMS[idx+1]; // lower number
-  const paras=f.presentazione.map((p,i)=>'<p'+(i===0?' class="leadp"':'')+'>'+linkRefs(p)+'</p>').join('');
+  const paras=f.presentazione.map((p,i)=>{
+        let body=linkRefs(p);
+        if(i===0){
+          // Capolettera: se inizia con una citazione (« o "), rendo virgoletta+lettera grandi (Opzione B).
+          // Gestisco un eventuale tag di apertura (es. <em>) subito dopo la virgoletta.
+          const m=body.match(/^(\u00AB|\u201C|")(\s*<[^>]+>)?(\s*)(\p{L})/u);
+          if(m){
+            const quote=m[1], tag=m[2]||'', sp=m[3]||'', letter=m[4];
+            const rest=body.slice(m[0].length);
+            return '<p class="leadp quotelead"><span class="dq">'+quote+'</span>'+tag+sp+'<span class="dropcap">'+letter+'</span>'+rest+'</p>';
+          }
+          return '<p class="leadp">'+body+'</p>';
+        }
+        return '<p>'+body+'</p>';
+      }).join('');
   const specs=[
     ['Regista',f.regista],['Anno',f.anno],['Durata',f.durata],
     ['Lingua',f.lingua]
